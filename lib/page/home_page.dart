@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_reader/page/direcciones_page.dart';
 import 'package:qr_reader/page/mapas_page.dart';
-import 'package:qr_reader/providers/db_provider.dart';
+import 'package:qr_reader/providers/scan_list_provider.dart';
 import 'package:qr_reader/providers/ui_provider.dart';
 import 'package:qr_reader/widgets/custom_navigationBar.dart';
 import 'package:qr_reader/widgets/scan_button.dart';
@@ -16,7 +16,12 @@ class HomePage extends StatelessWidget {
       appBar: AppBar(
         title: Text('Historial'),
         actions: [
-          IconButton(icon: Icon(Icons.delete_forever), onPressed: () {})
+          IconButton(
+              icon: Icon(Icons.delete_forever),
+              onPressed: () {
+                Provider.of<ScanListProvider>(context, listen: false)
+                    .deletedAllScan();
+              })
         ],
       ),
       body: _HomePageBody(),
@@ -32,14 +37,16 @@ class _HomePageBody extends StatelessWidget {
   Widget build(BuildContext context) {
     final uiProvider = Provider.of<UIProvider>(context);
 
+    final scanListProvider =
+        Provider.of<ScanListProvider>(context, listen: false);
+
     final currentIndex = uiProvider.selectedMenuOpt;
-    // TODO: Temporal leet base de datos
-    final tempScan = new ScanModel(value: 'http:google.com');
-    DBProvider.db.newScan(tempScan);
     switch (currentIndex) {
       case 0:
+        scanListProvider.loadingScanType('geo');
         return MapasPage();
       case 1:
+        scanListProvider.loadingScanType('http');
         return DireccionesPage();
 
       default:
